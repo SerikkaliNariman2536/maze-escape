@@ -16,7 +16,56 @@ public class Escape {
     public record Result(int[] path, int visited, int deadEnds) {}
 
     public static Result escape(Input.Walls w, int[] broken) {
-        // TODO
-        return new Result(new int[0], 0, 0);
+        int n = w.cells();
+        int cols = w.cols();
+        int exit = n - 1;
+        int[][] g = Graphs.open(w, broken);
+
+        int deadEnds = 0;
+        for (int i = 0; i < n; i++) {
+            if (g[i].length == 1) deadEnds++;
+        }
+
+        boolean[] seen = new boolean[n];
+        int[] next = new int[n];
+        int[] stack = new int[n];
+        int top = 0;
+
+        stack[top++] = 0;
+        seen[0] = true;
+        int visited = 1;
+
+        while (top > 0 && stack[top - 1] != exit) {
+            int cell = stack[top - 1];
+            if (next[cell] == 4) {
+                top--;
+                continue;
+            }
+            int dir = next[cell]++;
+            int nb = neighbour(cell, dir, cols, n);
+            if (nb >= 0 && !seen[nb] && isOpen(g[cell], nb)) {
+                seen[nb] = true;
+                visited++;
+                stack[top++] = nb;
+            }
+        }
+
+        return new Result(java.util.Arrays.copyOf(stack, top), visited, deadEnds);
+    }
+
+    private static int neighbour(int cell, int dir, int cols, int n) {
+        switch (dir) {
+            case 0:  return cell >= cols ? cell - cols : -1;
+            case 1:  return cell % cols != cols - 1 ? cell + 1 : -1;
+            case 2:  return cell + cols < n ? cell + cols : -1;
+            default: return cell % cols != 0 ? cell - 1 : -1;
+        }
+    }
+
+    private static boolean isOpen(int[] list, int cell) {
+        for (int x : list) {
+            if (x == cell) return true;
+        }
+        return false;
     }
 }
