@@ -46,7 +46,34 @@ public class Maze {
      * It must be equal to the total cost of cheapestMaze.
      */
     public static long primCost(Input.Walls w) {
-        // TODO
-        return 0;
+        int n = w.cells();
+
+        java.util.List<java.util.List<int[]>> adj = new java.util.ArrayList<>();
+        for (int i = 0; i < n; i++) adj.add(new java.util.ArrayList<>());
+        for (int i = 0; i < w.count(); i++) {
+            adj.get(w.a()[i]).add(new int[]{w.b()[i], w.cost()[i]});
+            adj.get(w.b()[i]).add(new int[]{w.a()[i], w.cost()[i]});
+        }
+
+        boolean[] inTree = new boolean[n];
+
+        java.util.PriorityQueue<int[]> pq =
+                new java.util.PriorityQueue<>((x, y) -> Integer.compare(x[1], y[1]));
+        long total = 0;
+        int taken = 0;
+
+        pq.add(new int[]{0, 0});
+        while (!pq.isEmpty() && taken < n) {
+            int[] top = pq.poll();
+            int v = top[0];
+            if (inTree[v]) continue;
+            inTree[v] = true;
+            total += top[1];
+            taken++;
+            for (int[] e : adj.get(v)) {
+                if (!inTree[e[0]]) pq.add(new int[]{e[0], e[1]});
+            }
+        }
+        return total;
     }
 }
