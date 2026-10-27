@@ -33,7 +33,7 @@ public class Maze {
         DisjointSet dsu = new DisjointSet(w.cells());
         int[] broken = new int[w.count()];
         int k = 0;
-        for (int idx : order) {                       // от дешёвой к дорогой
+        for (int idx : order) {
             if (dsu.union(w.a()[idx], w.b()[idx])) {
                 broken[k++] = idx;
             }
